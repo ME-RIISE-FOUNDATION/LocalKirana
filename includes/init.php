@@ -2,6 +2,24 @@
 // Session, auth and cart helpers for Local Kirana Connect
 
 if (session_status() === PHP_SESSION_NONE) {
+  // Store sessions inside the project's data/ folder rather than relying on the
+  // system temp dir. Under XAMPP/Apache the default save path (C:\xampp\tmp) can
+  // be missing or non-writable — when PHP can't persist session files, every
+  // request gets a fresh empty session, which shows up as being "logged out on
+  // refresh or after submitting a form". Keeping sessions with the database (a
+  // folder we know is writable) makes login survive refreshes everywhere.
+  $__sessDir = __DIR__ . '/../data/sessions';
+  if (!is_dir($__sessDir)) @mkdir($__sessDir, 0777, true);
+  if (is_dir($__sessDir) && is_writable($__sessDir)) {
+    session_save_path($__sessDir);
+  }
+  ini_set('session.gc_maxlifetime', '86400'); // keep sessions for 24h server-side
+  session_set_cookie_params([
+    'lifetime' => 0,      // cookie lives until the browser is closed
+    'path'     => '/',    // valid across the whole app
+    'httponly' => true,   // not readable from JavaScript
+    'samesite' => 'Lax',  // sent on normal navigation and same-site form posts
+  ]);
   session_start();
 }
 

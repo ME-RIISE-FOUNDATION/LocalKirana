@@ -71,3 +71,8 @@ There are no seeded logins — the app starts empty. Pick a role tab on the logi
 page, choose **Sign Up**, and create an account; then sign in with those
 credentials. Passwords are hashed and stored in the SQLite database, so the same
 account works on every later run (until you delete `data/localkirana.sqlite`).
+
+## License
+
+Copyright © 2026 **ME-RIISE Foundation**. All rights reserved.
+See [LICENSE](LICENSE) for the full terms.
