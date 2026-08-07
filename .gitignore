@@ -1,0 +1,15 @@
+# PHP / editor
+*.log
+.vscode/
+.idea/
+
+# Leftover Node/Vite artifacts (project is now plain PHP)
+node_modules/
+.vite/
+dist/
+
+# Runtime data (created vendor accounts with hashed passwords)
+data/
+
+# Uploaded product images
+uploads/
