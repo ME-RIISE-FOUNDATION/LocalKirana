@@ -1,0 +1,46 @@
+name: Deploy to Hostinger (FTP)
+
+# Auto-deploys the site to Hostinger every time you push to `main`.
+# You can also run it by hand from the GitHub "Actions" tab (workflow_dispatch).
+#
+# ONE-TIME SETUP — add these three secrets in GitHub:
+#   Repo → Settings → Secrets and variables → Actions → "New repository secret"
+#     FTP_SERVER    = your FTP host   (Hostinger hPanel → Files → FTP Accounts, e.g. ftp.kirana.meriise.org or an IP)
+#     FTP_USERNAME  = your FTP user   (from the same FTP Accounts page)
+#     FTP_PASSWORD  = your FTP password
+#
+# NOTE ON server-dir below:
+#   - If your FTP account opens directly INSIDE the website folder, set:  server-dir: ./
+#   - If it opens in the account home (with public_html as a subfolder), keep: ./public_html/
+#   Check by logging into FTP once — if you see index.php right away, use ./ ;
+#   if you see a public_html folder, keep ./public_html/.
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  ftp-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Upload files to Hostinger via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: ./public_html/
+          # Never overwrite the live database / sessions or repo meta files.
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/.github/**
+            data/**
+            **/*.sqlite
+            README.md
+            LICENSE
+            ATTRIBUTIONS.md
