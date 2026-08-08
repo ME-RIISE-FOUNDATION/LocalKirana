@@ -84,7 +84,7 @@ require __DIR__ . '/partials/head.php';
   <div class="bg-white rounded-2xl shadow-2xl w-full max-w-5xl overflow-hidden">
     <div class="grid grid-cols-1 md:grid-cols-2">
       <!-- Left branding -->
-      <div class="bg-gradient-to-br from-green-600 to-green-500 p-12 text-white flex flex-col justify-center">
+      <div class="bg-gradient-to-br from-green-600 to-green-500 p-8 md:p-12 text-white flex flex-col justify-center">
         <div class="mb-8">
           <i data-lucide="shopping-cart" class="w-16 h-16 mb-4"></i>
           <h1 class="text-4xl font-bold mb-4"><?= e(brand_name()) ?></h1>
@@ -101,7 +101,7 @@ require __DIR__ . '/partials/head.php';
       </div>
 
       <!-- Right form -->
-      <div class="p-12">
+      <div class="p-8 md:p-12">
         <a href="index.php" class="inline-block mb-6 px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100">← Back to Home</a>
 
         <div class="grid grid-cols-6 gap-1 mb-6 bg-gray-100 rounded-lg p-1">

@@ -32,12 +32,12 @@ require __DIR__ . '/partials/head.php';
 ?>
 <div class="min-h-screen bg-gray-50">
   <header class="bg-white border-b sticky top-0 z-50">
-    <div class="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
-      <a href="index.php" class="flex items-center gap-2">
-        <i data-lucide="shopping-cart" class="w-8 h-8 text-green-600"></i>
-        <h1 class="text-2xl font-bold text-green-600"><?= e($brand) ?></h1>
+    <div class="max-w-5xl mx-auto px-4 py-3 md:py-4 flex items-center justify-between gap-2">
+      <a href="index.php" class="flex items-center gap-2 min-w-0 shrink">
+        <i data-lucide="shopping-cart" class="w-7 h-7 md:w-8 md:h-8 text-green-600 shrink-0"></i>
+        <h1 class="text-lg md:text-2xl font-bold text-green-600 truncate"><?= e($brand) ?></h1>
       </a>
-      <a href="cart.php" class="px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100">← Back to cart</a>
+      <a href="cart.php" class="px-2.5 md:px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 shrink-0 text-sm md:text-base">← Back to cart</a>
     </div>
   </header>
 

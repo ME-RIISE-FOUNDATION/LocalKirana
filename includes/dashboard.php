@@ -18,13 +18,24 @@ function render_dashboard_start(array $shell): void {
   $active = $shell['activeTab'];
   ?>
   <div class="flex h-screen bg-gray-50">
-    <!-- Sidebar -->
-    <aside class="w-64 bg-white border-r flex flex-col">
-      <div class="p-6 border-b">
-        <h2 class="font-bold text-xl text-green-600"><?= e($shell['panelTitle']) ?></h2>
-        <p class="text-sm text-gray-600"><?= e($shell['panelSubtitle']) ?></p>
+    <!-- Mobile backdrop (tap to close the drawer) -->
+    <div id="dash-backdrop" data-sidebar-close class="fixed inset-0 z-40 bg-black/40 hidden md:hidden" aria-hidden="true"></div>
+
+    <!-- Sidebar: static column on md+, off-canvas drawer on mobile -->
+    <aside id="dash-sidebar"
+           class="fixed md:static inset-y-0 left-0 z-50 w-64 max-w-[82%] bg-white border-r flex flex-col
+                  -translate-x-full md:translate-x-0 transition-transform duration-200 ease-in-out">
+      <div class="p-6 border-b flex items-start justify-between gap-2">
+        <div class="min-w-0">
+          <h2 class="font-bold text-xl text-green-600 truncate"><?= e($shell['panelTitle']) ?></h2>
+          <p class="text-sm text-gray-600 truncate"><?= e($shell['panelSubtitle']) ?></p>
+        </div>
+        <button type="button" data-sidebar-close aria-label="Close menu"
+                class="md:hidden -mr-2 -mt-1 p-2 rounded-lg text-gray-400 hover:bg-gray-100">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
       </div>
-      <nav class="flex-1 p-4">
+      <nav class="flex-1 p-4 overflow-y-auto">
         <ul class="space-y-2">
           <?php foreach ($shell['nav'] as $item): ?>
             <li>
@@ -48,20 +59,26 @@ function render_dashboard_start(array $shell): void {
     </aside>
 
     <!-- Main -->
-    <div class="flex-1 flex flex-col overflow-hidden">
-      <header class="bg-white border-b px-8 py-4 flex items-center justify-between">
-        <div>
-          <h1 class="text-2xl font-bold text-gray-900"><?= e(ucfirst($active)) ?></h1>
-          <p class="text-sm text-gray-600"><?= e($shell['headerSubtitle']) ?></p>
+    <div class="flex-1 flex flex-col overflow-hidden min-w-0">
+      <header class="bg-white border-b px-4 md:px-8 py-3 md:py-4 flex items-center justify-between gap-3">
+        <div class="flex items-center gap-2 md:gap-3 min-w-0">
+          <button type="button" data-sidebar-toggle aria-label="Open menu"
+                  class="md:hidden -ml-1 p-2 rounded-lg text-gray-600 hover:bg-gray-100 shrink-0">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+          </button>
+          <div class="min-w-0">
+            <h1 class="text-lg md:text-2xl font-bold text-gray-900 truncate"><?= e(ucfirst($active)) ?></h1>
+            <p class="text-xs md:text-sm text-gray-600 truncate"><?= e($shell['headerSubtitle']) ?></p>
+          </div>
         </div>
-        <div class="flex items-center gap-4">
+        <div class="flex items-center gap-2 md:gap-4 shrink-0">
           <div class="relative">
             <button data-bell type="button" class="relative border rounded-lg p-2 hover:bg-gray-50">
               <i data-lucide="bell" class="w-5 h-5"></i>
               <?php $notifs = $shell['notifList'] ?? []; ?>
               <?php if ($notifs): ?><span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center"><?= count($notifs) ?></span><?php endif; ?>
             </button>
-            <div id="notif-panel" class="hidden absolute right-0 mt-2 w-80 bg-white border rounded-xl shadow-xl z-50">
+            <div id="notif-panel" class="hidden absolute right-0 mt-2 w-80 max-w-[calc(100vw-2rem)] bg-white border rounded-xl shadow-xl z-50">
               <div class="px-4 py-3 border-b font-semibold text-sm">Notifications</div>
               <ul class="max-h-80 overflow-auto divide-y">
                 <?php foreach ($notifs as $n): ?>
@@ -72,15 +89,15 @@ function render_dashboard_start(array $shell): void {
             </div>
           </div>
           <div class="flex items-center gap-3">
-            <div class="text-right">
+            <div class="text-right hidden sm:block">
               <p class="font-semibold text-sm"><?= e($shell['userName']) ?></p>
               <p class="text-xs text-gray-600"><?= e($shell['roleLabel']) ?></p>
             </div>
-            <div class="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center text-white font-semibold"><?= e(mb_substr($shell['userName'], 0, 1)) ?></div>
+            <div class="w-9 h-9 md:w-10 md:h-10 bg-green-600 rounded-full flex items-center justify-center text-white font-semibold shrink-0"><?= e(mb_substr($shell['userName'], 0, 1)) ?></div>
           </div>
         </div>
       </header>
-      <main class="flex-1 overflow-auto p-8">
+      <main class="flex-1 overflow-auto p-4 md:p-6 lg:p-8">
   <?php
 }
 
@@ -89,6 +106,23 @@ function render_dashboard_end(): void {
       </main>
     </div>
   </div>
+  <script>
+    // Mobile off-canvas sidebar (drawer) toggle. No-op on md+ where the sidebar is static.
+    (function () {
+      var sidebar  = document.getElementById('dash-sidebar');
+      var backdrop = document.getElementById('dash-backdrop');
+      if (!sidebar) return;
+      function openDrawer()  { sidebar.classList.remove('-translate-x-full'); if (backdrop) backdrop.classList.remove('hidden'); }
+      function closeDrawer() { sidebar.classList.add('-translate-x-full');    if (backdrop) backdrop.classList.add('hidden'); }
+      document.addEventListener('click', function (e) {
+        if (e.target.closest('[data-sidebar-toggle]')) { e.preventDefault(); openDrawer();  return; }
+        if (e.target.closest('[data-sidebar-close]'))  { e.preventDefault(); closeDrawer(); return; }
+      });
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeDrawer(); });
+      // If the viewport grows to desktop, make sure the drawer state is reset.
+      window.addEventListener('resize', function () { if (window.innerWidth >= 768) closeDrawer(); });
+    })();
+  </script>
   <?php
 }
 
